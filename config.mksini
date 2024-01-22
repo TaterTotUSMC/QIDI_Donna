@@ -12,17 +12,17 @@ enable                         = 1
 
 
 [target]
-extruder                       = 300
-heaterbed                      = 100
-hot                            = 0
+extruder                       = 240
+heaterbed                      = 110
+hot                            = 55
 
 
 [babystep]
-value                          = -0.850000
+value                          = 0.150
 
 
 [total]
-time                           = 5202
+time                           = 7305
 
 
 [oobe]
