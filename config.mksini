@@ -18,7 +18,7 @@ hot                            = 55
 
 
 [babystep]
-value                          = -0.650
+value                          = -0.350000
 
 
 [total]
