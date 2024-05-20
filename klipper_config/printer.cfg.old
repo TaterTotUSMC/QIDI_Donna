@@ -1,6 +1,5 @@
-#[include moonraker_obico_macros.cfg]
 #MAX3
-#V4.3.10
+#V4.3.11
 # This file contains common pin mappings for MKS SKIPR
 # boards. To use this config, the firmware should be compiled for the
 # stm32f407. When running "make menuconfig", select the 48KiB
@@ -22,59 +21,13 @@
 
 # See docs/Config_Reference.md for a description of parameters.
 [include MKS_THR.cfg]
-[respond]
-[include timelapse.cfg]
 [include Adaptive_Mesh.cfg]
-[include dev_z_offset_protection.cfg]
-
-[save_variables]
-filename: ~/klipper_config/variables.cfg
-# required by Z Offset Protection System
-
 [mcu]
 # The hardware use USART1 PA10/PA9 connect to RK3328
 #serial: /dev/serial/by-id/usb-Klipper_stm32f407xx_4D0045001850314335393520-if00
 serial: /dev/ttyS0
 restart_method: command
-[temperature_sensor Toolhead]
-sensor_type: temperature_mcu
-sensor_mcu: MKS_THR
-min_temp: 0
-max_temp: 105
-################################################################################
-# Host RK3328 Temp - Operating temp 85
-################################################################################
-[temperature_sensor Host]
-sensor_type: temperature_host
-min_temp: -20
-max_temp: 105 # Max Conjunction Temperature 125
-################################################################################
-# MCU STM32F407VET6 Temp - Operating temp 85
-################################################################################
-[temperature_sensor MCU]
-sensor_type: temperature_mcu
-min_temp: -40
-max_temp: 105 # Max Conjunction Temperature 125
-################################################################################
-# Toolhead RP2040 Temp - Max temp 85
-################################################################################
-;[temperature_sensor Toolhead]
-;sensor_type: temperature_mcu
-;sensor_mcu: MKS_THR
-;min_temp: 0
-;max_temp: 90
-[firmware_retraction]
-retract_length: 0.5
-# The length of filament (in mm) to retract when G10 is activated,
-# and to unretract when G11 is activated (but see
-# unretract_extra_length below). The default is 0 mm.
-retract_speed: 50
-# The speed of retraction, in mm/s. The default is 20 mm/s.
-unretract_extra_length: 0
-# The length (in mm) of *additional* filament to add when
-# unretracting.
-unretract_speed: 50
-# The speed of unretraction, in mm/s. The default is 10 mm/s.
+
 
 #[mcu MKS_THR]
 #serial:/dev/serial/by-id/usb-Klipper_rp2040_D5CE4D9543D14858-if00
@@ -95,7 +48,7 @@ rotation_distance: 53.5  #22.6789511	#Bondtech 5mm Drive Gears
 gear_ratio: 1628:170				
 microsteps: 16
 full_steps_per_rotation: 200	#200 for 1.8 degree, 400 for 0.9 degree
-nozzle_diameter: 0.800
+nozzle_diameter: 0.400
 filament_diameter: 1.75
 min_temp: 0
 max_temp: 360
@@ -126,17 +79,17 @@ spi_software_miso_pin:MKS_THR:gpio16
 #   chips. The defaults for each parameter are next to the parameter
 #   name in the above list.
 max_power: 1.0
-#control : pid  
-#pid_Kp=14.734
-#pid_Ki=6.549 
-#pid_Kd=8.288
+control : pid  
+pid_Kp=14.734
+pid_Ki=6.549 
+pid_Kd=8.288
 
 pressure_advance: 0.032
 pressure_advance_smooth_time: 0.03
 max_extrude_cross_section:500
 instantaneous_corner_velocity: 10.000
-max_extrude_only_distance: 300.0
-max_extrude_only_velocity:15000
+max_extrude_only_distance: 120.0
+max_extrude_only_velocity:5000
 max_extrude_only_accel:2000
 step_pulse_duration:0.000002
 
@@ -197,7 +150,7 @@ step_pin:PB4
 dir_pin:PB3
 enable_pin:!PB5
 microsteps:16
-rotation_distance: 39.94
+rotation_distance: 39.88
 full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
 endstop_pin:tmc2209_stepper_x:virtual_endstop
 position_min: -7
@@ -213,7 +166,7 @@ step_pin:PC14
 dir_pin:PC13
 enable_pin:!PC15
 microsteps: 16
-rotation_distance: 39.94
+rotation_distance: 39.88
 full_steps_per_rotation:200  #set to 400 for 0.9 degree stepper
 endstop_pin:tmc2209_stepper_y:virtual_endstop
 position_min: -9.5
@@ -237,9 +190,9 @@ endstop_pin:probe:z_virtual_endstop#!PC3 #for Z-max; endstop have'!' is NO
 #position_endstop:326
 position_max:325
 position_min: -6
-homing_speed: 15
-homing_retract_dist: 5
-second_homing_speed: 5
+homing_speed: 8
+homing_retract_dist: 8.0
+second_homing_speed: 8
 homing_positive_dir:false
 step_pulse_duration:0.000002
 
@@ -481,6 +434,15 @@ heater_temp: 50.0
 fan_speed: 1.0
 off_below: 0
 
+[heater_fan borad_fan]
+pin:PC4
+max_power: 1.0
+kick_start_time: 0.5
+heater: extruder
+heater_temp: 50.0
+fan_speed: 1.0
+off_below: 0
+
 
 ## FAN0  吹模型风扇
 [output_pin fan0]
@@ -532,23 +494,23 @@ switch_pin: !PC1
 
 [bed_mesh]
 speed:150               #调平速度
-horizontal_move_z:3   #调平中Z抬高高度
-mesh_min:25,15       #探测点最小位置
+horizontal_move_z:10   #调平中Z抬高高度
+mesh_min:25,10        #探测点最小位置
 mesh_max:315,315      #探测点最大位置
-probe_count:8,8      #调平点数
+probe_count:9,9      #调平点数
 algorithm:bicubic
 bicubic_tension:0.2
 mesh_pps: 4, 4
 
-[bltouch]
-sensor_pin:^MKS_THR:gpio21
-control_pin:MKS_THR:gpio11
-stow_on_each_sample: False
-#[probe]
-#pin: ^!MKS_THR:gpio21
+#[bltouch]
+#sensor_pin:^MKS_THR:gpio21
+#control_pin:MKS_THR:gpio11
+#stow_on_each_sample: False
+[probe]
+pin: ^!MKS_THR:gpio21
 x_offset: 28
 y_offset: 4.4
-#z_offset: 0.0
+z_offset: 0.0
 speed: 5
 samples: 2
 samples_result: average
@@ -567,12 +529,6 @@ accel_chip:adxl345
 probe_points:
     160, 160, 10  # an example
 
-[gcode_macro Tate_Eject]
-gcode:
-    M109 S240
-    G1 E10
-    G1 E-100
-    
 [gcode_macro SHAPER_CALIBRATE]
 rename_existing: RESHAPER_CALIBRATE
 gcode:
@@ -602,12 +558,11 @@ gcode:
 [gcode_macro PRINT_START]
 gcode:
     #HOT_CALIBRATE_START
-   
 
 [gcode_macro PRINT_START_QD]
 gcode:
     #HOT_CALIBRATE_START
-  
+
 [gcode_macro CANCEL_PRINT]
 rename_existing: BASE_CANCEL_PRINT
 gcode:
@@ -677,7 +632,7 @@ gcode:
         G1 X{printer.toolhead.axis_maximum.x/2} Y{printer.toolhead.axis_maximum.y} F6000   ; park toolhead at front center
         SAVE_GCODE_STATE NAME=PAUSEPARK                                                      ; save parked position in case toolhead is moved during the pause (otherwise the return zhop can error) 
         M104 S0                                                                              ; turn off hotend
-        SET_IDLE_TIMEOUT TIMEOUT=43200                                                       ; set timeout to 12 hours
+        SET_IDLE_TIMEOUT TIMEOUT=86400                                                      ; set timeout to 12 hours
 
         SET_STEPPER_ENABLE STEPPER=extruder enable=0
     {% endif %}
@@ -757,6 +712,16 @@ gcode:
 [gcode_macro M141]
 gcode:
       SET_HEATER_TEMPERATURE HEATER=hot TARGET={params.S}
+      
+[gcode_macro M191]
+gcode:
+    #Parameters
+    {% set s = params.S|float %}
+    
+    M141 {% for p in params %}{'%s%s' % (p, params[p])}{% endfor %}  ; Set hotend temp
+    {% if s != 0 %}
+        TEMPERATURE_WAIT SENSOR="heater_generic hot" MINIMUM={s} MAXIMUM={s+1}   ; Wait for hotend temp (within 1 degree)
+    {% endif %}
 
     
 [gcode_macro M106]
@@ -860,7 +825,7 @@ gcode:
     
 [output_pin sound]
 pin: PA13
-value:1
+value:0
 
 
 [gcode_macro beep_on]
@@ -906,11 +871,13 @@ gcode:
 description: filament unlode
 gcode:
     G92 E0
-    G0  E15 F400
-    G4  P1000
-    G92 E0
-    G1  E-80 F800
+    G0  E100 F400
 
+[gcode_macro M604]
+description: filament lode
+gcode:
+    M83
+    G1  E80 F400
 
 #####################################新增KAMP调平
 [exclude_object]
@@ -952,7 +919,7 @@ gcode:
 
 
 [idle_timeout]
-timeout: 5400
+timeout: 86400
 
 
 
@@ -992,80 +959,4 @@ path: ~/gcode_files
 #*# <---------------------- SAVE_CONFIG ---------------------->
 #*# DO NOT EDIT THIS BLOCK OR BELOW. The contents are auto-generated.
 #*#
-#*# [bed_mesh default]
-#*# version = 1
-#*# points =
-#*# 	-0.483750, -0.492500, -0.470000, -0.413750, -0.402500, -0.468750, -0.427500, -0.376250
-#*# 	-0.388750, -0.377500, -0.338750, -0.295000, -0.303750, -0.345000, -0.307500, -0.256250
-#*# 	-0.303750, -0.273750, -0.227500, -0.188750, -0.191250, -0.208750, -0.186250, -0.127500
-#*# 	-0.230000, -0.198750, -0.156250, -0.080000, -0.065000, -0.106250, -0.072500, -0.010000
-#*# 	-0.181250, -0.140000, -0.091250, -0.038750, -0.021250, -0.022500, 0.046250, 0.096250
-#*# 	-0.131250, -0.107500, -0.042500, 0.041250, 0.081250, 0.050000, 0.111250, 0.161250
-#*# 	-0.081250, -0.038750, -0.003750, 0.073750, 0.093750, 0.075000, 0.148750, 0.177500
-#*# 	-0.017500, -0.003750, 0.042500, 0.092500, 0.147500, 0.088750, 0.156250, 0.216250
-#*# 	-0.082500, -0.067500, 0.007500, 0.077500, 0.058750, 0.032500, 0.118750, 0.217500
-#*# tension = 0.2
-#*# min_x = 25.0
-#*# algo = bicubic
-#*# y_count = 9
-#*# mesh_y_pps = 4
-#*# min_y = 15.0
-#*# x_count = 8
-#*# max_y = 315.0
-#*# mesh_x_pps = 4
-#*# max_x = 314.94
-#*#
-#*# [bed_mesh kamp]
-#*# version = 1
-#*# points =
-#*# 	-0.065000, -0.010000, -0.041250
-#*# 	-0.061250, 0.010000, -0.037500
-#*# 	-0.066250, 0.031250, 0.006250
-#*# tension = 0.2
-#*# min_x = 127.75
-#*# algo = lagrange
-#*# y_count = 3
-#*# mesh_y_pps = 4
-#*# min_y = 152.5
-#*# x_count = 3
-#*# max_y = 172.5
-#*# mesh_x_pps = 4
-#*# max_x = 197.75
-#*#
-#*# [input_shaper]
-#*# shaper_type_x = ei
-#*# shaper_freq_x = 49.4
-#*# shaper_type_y = zv
-#*# shaper_freq_y = 43.8
-#*#
-#*# [bltouch]
-#*# z_offset = 0.0
-#*#
-#*# [extruder]
-#*# control = pid
-#*# pid_kp = 17.268
-#*# pid_ki = 1.175
-#*# pid_kd = 63.460
-#*#
-#*# [bed_mesh PETG]
-#*# version = 1
-#*# points =
-#*# 	-0.483750, -0.492500, -0.470000, -0.413750, -0.402500, -0.468750, -0.427500, -0.376250
-#*# 	-0.388750, -0.377500, -0.338750, -0.295000, -0.303750, -0.345000, -0.307500, -0.256250
-#*# 	-0.303750, -0.273750, -0.227500, -0.188750, -0.191250, -0.208750, -0.186250, -0.127500
-#*# 	-0.230000, -0.198750, -0.156250, -0.080000, -0.065000, -0.106250, -0.072500, -0.010000
-#*# 	-0.181250, -0.140000, -0.091250, -0.038750, -0.021250, -0.022500, 0.046250, 0.096250
-#*# 	-0.131250, -0.107500, -0.042500, 0.041250, 0.081250, 0.050000, 0.111250, 0.161250
-#*# 	-0.081250, -0.038750, -0.003750, 0.073750, 0.093750, 0.075000, 0.148750, 0.177500
-#*# 	-0.017500, -0.003750, 0.042500, 0.092500, 0.147500, 0.088750, 0.156250, 0.216250
-#*# 	-0.082500, -0.067500, 0.007500, 0.077500, 0.058750, 0.032500, 0.118750, 0.217500
-#*# tension = 0.2
-#*# min_x = 25.0
-#*# algo = bicubic
-#*# y_count = 9
-#*# mesh_y_pps = 4
-#*# min_y = 15.0
-#*# x_count = 8
-#*# max_y = 315.0
-#*# mesh_x_pps = 4
-#*# max_x = 314.94
+
