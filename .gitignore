@@ -1,3 +1,5 @@
+.conf
+.env
 secrets.conf
 *.swp
 *.tmp
